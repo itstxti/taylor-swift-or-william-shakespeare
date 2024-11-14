@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taylor Swift or William Shakespeare</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+
+<body>
+
+    <!-- Pantalla de inicio -->
+    <div id="start-screen">
+        <h1>
+            Did <i>
+                <font color="#0b5eaa">Taylor Swift</font>
+            </i> or <i>
+                <font color="#0b5eaa">Shakespeare</font>
+            </i> Say This?
+        </h1>
+        <div class="button-container">
+            <button id="infinite-mode-btn" onclick="startGameInfinite()">Infinite Mode</button>
+            <button id="normal-mode-btn" onclick="startGameNormal()">Normal Mode</button>
+        </div>
+    </div>
+
+    <!-- Contenedor del juego -->
+    <div id="game-container" class="container" style="display: none; font-weight: bold;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <!-- Botón de flecha a la izquierda -->
+            <button id="back-button" onclick="backToStart()"
+                style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+
+            <!-- Texto a la derecha -->
+            <span id="mode" style="font-size: 20px;">""</span>
+        </div>
+
+        <!-- Puntuación en la parte superior -->
+        <div id="scoreboard">
+            <span>Correct: <span id="aciertos">0</span></span>
+            <span>Wrong: <span id="errores">0</span></span>
+            <span>Score: <span id="puntuacion">0</span></span>
+            <span id="vidas">Lives: 5</span> <!-- Mostrar las vidas -->
+        </div>
+
+        <h1>
+            Did <i>
+                <font color="#0b5eaa">Taylor Swift</font>
+            </i> or <i>
+                <font color="#0b5eaa">Shakespeare</font>
+            </i> Say This?
+        </h1>
+
+        <div id="fileContent">A random phrase will appear here...</div>
+
+        <!-- Div para mostrar la fuente -->
+        <div id="source" style="font-style: italic; color: #777; text-align: center; margin-top: 10px; display: none;">
+        </div>
+
+        <div id="result"></div>
+
+        <div class="button-container">
+            <button class="button" id="shakespeareBtn" onclick="checkAnswer('Shakespeare')">Shakespeare</button>
+            <button class="button" id="taylorBtn" onclick="checkAnswer('Taylor Swift')">Taylor</button>
+            <button class="button" id="skipBtn" onclick="checkAnswer('Skip')">Skip</button>
+
+        </div>
+
+        <div class="button-container" style="margin-top: 20px;">
+            <button class="reset-button" id="resetBtn" onclick="resetGame()">Reset Game</button>
+        </div>
+
+        <div class="tooltip-container">
+            <div class="tooltip">
+                <i class="fas fa-question-circle"></i>
+                <span id="help" class="tooltiptext">Game instructions here...</span>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
