@@ -15,6 +15,10 @@ let vidas = 0;
 // Cargar los sonidos
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
+wrongSound.volume = 1.5;
+correctSound.volume = 1.0;
+resetSound.volume = 1.0;
+clickSound.volume = 1.0;
 const resetSound = new Audio('sounds/reset.mp3');
 const clickSound = new Audio('sounds/click.mp3');
 
