@@ -15,21 +15,17 @@ let vidas = 0;
 // Cargar los sonidos
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
-wrongSound.volume = 1.5;
-correctSound.volume = 1.0;
-resetSound.volume = 1.0;
-clickSound.volume = 1.0;
 const resetSound = new Audio('sounds/reset.mp3');
 const clickSound = new Audio('sounds/click.mp3');
 
 // URLs de las APIs
 const SHAKESPEARE_API = "https://shakespeare-quotes-api.onrender.com/quotes/random";
-const TAYLOR_SWIFT_API = "https://taylor-swift-api.vercel.app/api/quotes?album=1989";
+const TAYLOR_SWIFT_API_BASE = "https://taylor-swift-api.vercel.app/api/quotes";
 
 async function loadFrase() {
     // Elegir aleatoriamente entre Shakespeare y Taylor Swift
     const isShakespeare = Math.random() < 0.5;
-
+    
     try {
         if (isShakespeare) {
             correctFile = 'Shakespeare';
@@ -39,7 +35,10 @@ async function loadFrase() {
             currentSource = data.play || 'Unknown work';
         } else {
             correctFile = 'Taylor Swift';
-            const response = await fetch(TAYLOR_SWIFT_API);
+            // Seleccionar un álbum aleatorio
+            const apiUrl = TAYLOR_SWIFT_API_BASE;
+
+            const response = await fetch(apiUrl);
             const data = await response.json();
 
             // Verificar si la cita contiene '/' y buscar otra si es necesario
@@ -49,7 +48,7 @@ async function loadFrase() {
             }
 
             currentPhrase = data.quote;
-            currentSource = '1989 (Taylor\'s Version)';
+            currentSource = `${data.song} (${data.album})`;
         }
 
         document.getElementById('fileContent').innerHTML = currentPhrase;
