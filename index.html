@@ -5,89 +5,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taylor Swift or William Shakespeare</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 </head>
 
 <body>
-
     <!-- Pantalla de inicio -->
     <div id="start-screen">
-        <h1>
-            Did <i>
-                <font color="#0b5eaa">Taylor Swift</font>
-            </i> or <i>
-                <font color="#0b5eaa">Shakespeare</font>
-            </i> Say This?
+        <h1 style="padding-top:5%">
+            Did <span style="color: var(--swift-blue);">Taylor Swift</span> or <span
+                style="color: var(--shakespeare-gold);">Shakespeare</span> Say This?
         </h1>
-        <div class="button-container">
-            <button id="infinite-mode-btn" onclick="startGameInfinite()">Infinite Mode</button>
-            <button id="normal-mode-btn" onclick="startGameNormal()">Normal Mode</button>
+        <p style="color: var(--text-light); margin-bottom: 30px; line-height: 1.6;">
+            Test your knowledge of lyrics and literature in this fun guessing game!
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button id="infinite-mode-btn" class="mode-button" onclick="startGameInfinite()">
+                <i class="fas fa-infinity"></i> Infinite Mode
+            </button>
+            <button id="normal-mode-btn" class="mode-button" onclick="startGameNormal()">
+                <i class="fas fa-list-ol"></i> Normal Mode
+            </button>
         </div>
+
+        <div style="display: flex; justify-content: center; gap: 20px; margin: 60px 0;">
+            <div style="text-align: center;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_4.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_4.png"
+                    style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--swift-blue);">
+                <p style="color: var(--swift-blue); margin-top: 8px; font-weight: 600;">Taylor Swift</p>
+            </div>
+            <div style="text-align: center;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Shakespeare.jpg/220px-Shakespeare.jpg"
+                    style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--shakespeare-gold);">
+                <p style="color: var(--shakespeare-gold); margin-top: 8px; font-weight: 600;">Shakespeare</p>
+            </div>
+
+        </div>
+
     </div>
 
     <!-- Contenedor del juego -->
-    <div id="game-container" class="container" style="display: none; font-weight: bold;">
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <!-- Botón de flecha a la izquierda -->
-            <button id="back-button" onclick="backToStart()"
-                style="background: none; border: none; font-size: 20px; cursor: pointer;">
+    <div id="game-container" class="container">
+        <div class="header-container">
+            <button id="back-button" onclick="backToStart()">
                 <i class="fas fa-arrow-left"></i>
             </button>
-
-            <!-- Texto a la derecha -->
-            <span id="mode" style="font-size: 20px;">""</span>
-        </div>
-
-        <!-- Puntuación en la parte superior -->
-        <div id="scoreboard">
-            <span>Correct: <span id="aciertos">0</span></span>
-            <span>Wrong: <span id="errores">0</span></span>
-            <span>Score: <span id="puntuacion">0</span></span>
-            <span id="vidas">Lives: 5</span> <!-- Mostrar las vidas -->
+            <span id="mode"></span>
         </div>
 
         <h1>
-            Did <i>
-                <font color="#0b5eaa">Taylor Swift</font>
-            </i> or <i>
-                <font color="#0b5eaa">Shakespeare</font>
-            </i> Say This?
+            <span style="color: var(--swift-blue);">Taylor Swift</span> or <span
+                style="color: var(--shakespeare-gold);">Shakespeare</span>?
         </h1>
-
-        <div id="fileContent">A random phrase will appear here...</div>
-
-        <!-- Div para mostrar la fuente -->
-        <div id="source" style="font-style: italic; color: #777; text-align: center; margin-top: 10px; display: none;">
+        <div id="scoreboard">
+            <span><i class="fas fa-check-circle" style="color: var(--correct-green);"></i> <span
+                    id="aciertos">0</span></span>
+            <span><i class="fas fa-times-circle" style="color: var(--wrong-red);"></i> <span
+                    id="errores">0</span></span>
+            <span><i class="fas fa-star" style="color: var(--shakespeare-gold);"></i> <span
+                    id="puntuacion">0</span></span>
+            <span id="vidas"><i class="fas fa-heart" style="color: var(--wrong-red);"></i> 5</span>
         </div>
+        <div id="fileContent">Loading a random quote...</div>
+
+        <div id="source"></div>
 
         <div id="result"></div>
 
         <div class="button-container">
-            <button class="button" id="shakespeareBtn" onclick="checkAnswer('Shakespeare')">Shakespeare</button>
-            <button class="button" id="taylorBtn" onclick="checkAnswer('Taylor Swift')">Taylor</button>
-            <button class="button" id="skipBtn" onclick="checkAnswer('Skip')">Skip</button>
-
+            <button class="button" id="shakespeareBtn" onclick="checkAnswer('Shakespeare')">
+                <i class="fas fa-theater-masks"></i> Shakespeare
+            </button>
+            <button class="button" id="taylorBtn" onclick="checkAnswer('Taylor Swift')">
+                <i class="fas fa-music"></i> Taylor
+            </button>
+            <button class="button" id="skipBtn" onclick="checkAnswer('Skip')">
+                <i class="fas fa-forward"></i> Skip
+            </button>
         </div>
 
-        <div class="button-container" style="margin-top: 20px;">
-            <button class="reset-button" id="resetBtn" onclick="resetGame()">Reset Game</button>
-        </div>
+        <button class="reset-button" id="resetBtn" onclick="resetGame()">
+            <i class="fas fa-redo"></i> Reset Game
+        </button>
 
         <div class="tooltip-container">
             <div class="tooltip">
                 <i class="fas fa-question-circle"></i>
-                <span id="help" class="tooltiptext">Game instructions here...</span>
+                <span id="help" class="tooltiptext">Game instructions will appear here based on the selected
+                    mode.</span>
             </div>
         </div>
-
-
     </div>
 
     <script src="script.js"></script>
-
 </body>
 
 </html>

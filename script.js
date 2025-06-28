@@ -12,32 +12,49 @@ let vidasNormal = 10;
 let vidaInfinito = 5;
 let vidas = 0;
 
-
 // Cargar los sonidos
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
 const resetSound = new Audio('sounds/reset.mp3');
 const clickSound = new Audio('sounds/click.mp3');
 
+// URLs de las APIs
+const SHAKESPEARE_API = "https://shakespeare-quotes-api.onrender.com/quotes/random";
+const TAYLOR_SWIFT_API = "https://taylor-swift-api.vercel.app/api/quotes?album=1989";
 
-function loadFrase() {
-    const archivos = ['quotes/Shakespeare', 'quotes/Taylor Swift'];
-    correctFile = archivos[Math.floor(Math.random() * archivos.length)];
+async function loadFrase() {
+    // Elegir aleatoriamente entre Shakespeare y Taylor Swift
+    const isShakespeare = Math.random() < 0.5;
 
-    fetch(correctFile)
-        .then(response => response.text())
-        .then(data => {
-            const lines = data.split('\n');
-            const randomIndex = Math.floor(Math.random() * lines.length);
-            const [phrase, source] = lines[randomIndex].split(' – ');
-            currentPhrase = phrase.trim();
-            currentSource = source ? source.trim() : '';
-            document.getElementById('fileContent').innerHTML = currentPhrase;
-            document.getElementById('source').style.display = 'none';
-        })
-        .catch(error => {
-            console.error('Error loading file:', error);
-        });
+    try {
+        if (isShakespeare) {
+            correctFile = 'Shakespeare';
+            const response = await fetch(SHAKESPEARE_API);
+            const data = await response.json();
+            currentPhrase = data.quote;
+            currentSource = data.play || 'Unknown work';
+        } else {
+            correctFile = 'Taylor Swift';
+            const response = await fetch(TAYLOR_SWIFT_API);
+            const data = await response.json();
+
+            // Verificar si la cita contiene '/' y buscar otra si es necesario
+            if (data.quote.includes('/')) {
+                loadFrase();
+                return;
+            }
+
+            currentPhrase = data.quote;
+            currentSource = '1989 (Taylor\'s Version)';
+        }
+
+        document.getElementById('fileContent').innerHTML = currentPhrase;
+        document.getElementById('source').style.display = 'none';
+    } catch (error) {
+        console.error('Error loading quote:', error);
+        document.getElementById('fileContent').innerHTML = "Error loading quote. Trying again...";
+        setTimeout(loadFrase, 1000);
+    }
 }
 
 function checkAnswer(selectedAuthor) {
@@ -48,34 +65,34 @@ function checkAnswer(selectedAuthor) {
     isButtonDisabled = true;
     document.getElementById('shakespeareBtn').disabled = true;
     document.getElementById('taylorBtn').disabled = true;
+    document.getElementById('skipBtn').disabled = true;
 
     const result = document.getElementById('result');
-    const actualAuthor = correctFile.includes('Shakespeare') ? 'Shakespeare' : 'Taylor Swift';
+    const actualAuthor = correctFile;
 
     if (selectedAuthor === "Skip") {
         puntuacion += 0;
         correctSound.play();
-        result.style.color = "#333";
+        result.style.color = "var(--text-dark)";
 
-        result.innerHTML = `The quote is from ${actualAuthor}. (0)`;
+        result.innerHTML = `The quote is from <strong>${actualAuthor}</strong>. <span style="color: var(--text-light)">(0)</span>`;
 
         updateScoreboard();
-        document.getElementById('source').innerHTML = `Source: ${currentSource}`;
+        document.getElementById('source').innerHTML = `<i class="fas fa-book"></i> Source: ${currentSource}`;
         document.getElementById('source').style.display = 'block';
 
         if (modeText === "Normal Mode") {
             vidas -= 1;
-            document.getElementById("vidas").innerText = `Guesses: ${vidas}`;
-
+            document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
         }
 
         if (modeText === "Infinite Mode") {
             vidas -= 1;
-            document.getElementById("vidas").innerText = `Lives: ${vidas}`;
+            document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
             if (vidas === 0) {
                 updateScoreboard();
                 endGame();
-                return;  // Si se acaban las vidas, termina el juego
+                return;
             }
         }
 
@@ -89,41 +106,37 @@ function checkAnswer(selectedAuthor) {
         } else {
             endGame();
         }
-        return;   //Termina la función antes de continuar
+        return;
     }
 
     if (selectedAuthor === actualAuthor) {
-        result.innerHTML = `Correct! The quote is from ${actualAuthor}. (+1)`;
-        result.style.color = "#008f39";
+        result.innerHTML = `<span style="color: var(--correct-green);"><i class="fas fa-check-circle"></i> Correct!</span> The quote is from <strong>${actualAuthor}</strong>. <span style="color: var(--correct-green)">(+1)</span>`;
         aciertos++;
         puntuacion += 1;
         correctSound.play();
-
     } else {
-        result.innerHTML = `Wrong! The quote is from ${actualAuthor}. (-1)`;
-        result.style.color = "#940b0b";
+        result.innerHTML = `<span style="color: var(--wrong-red);"><i class="fas fa-times-circle"></i> Wrong!</span> The quote is from <strong>${actualAuthor}</strong>. <span style="color: var(--wrong-red)">(-1)</span>`;
         errores++;
         puntuacion -= 1;
         wrongSound.play();
 
-        // Restar una vida si es el modo infinito
         if (isInfiniteMode) {
             vidas--;
             if (vidas === 0) {
                 updateScoreboard();
                 endGame();
-                return;  // Si se acaban las vidas, termina el juego
+                return;
             }
         }
-
     }
+
     if (modeText === "Normal Mode") {
         vidas -= 1;
-        document.getElementById("vidas").innerText = `Guesses: ${vidas}`;
-
+        document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
     }
+
     updateScoreboard();
-    document.getElementById('source').innerHTML = `Source: ${currentSource}`;
+    document.getElementById('source').innerHTML = `<i class="fas fa-book"></i> Source: ${currentSource}`;
     document.getElementById('source').style.display = 'block';
 
     phrasesCount++;
@@ -149,9 +162,9 @@ function updateScoreboard() {
     document.getElementById('puntuacion').innerText = puntuacion;
     let modeText = document.getElementById("mode").innerText;
     if (modeText === "Infinite Mode") {
-        document.getElementById("vidas").innerText = `Lives: ${vidas}`;
+        document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
     } else {
-        document.getElementById("vidas").innerText = `Guesses: ${vidas}`;
+        document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
     }
 }
 
@@ -159,16 +172,15 @@ function resetGame() {
     aciertos = 0;
     errores = 0;
     puntuacion = 0;
-    phrasesCount =0;
+    phrasesCount = 0;
     updateScoreboard();
     let modeText = document.getElementById("mode").innerText;
     if (modeText === "Infinite Mode") {
         vidas = vidaInfinito;
-        document.getElementById("vidas").innerText = `Lives: ${vidas}`;
+        document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
     } else {
         vidas = vidasNormal;
-        document.getElementById("vidas").innerText = `Guesses: ${vidas}`;
-
+        document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
     }
 
     document.getElementById('result').innerHTML = '';
@@ -184,11 +196,22 @@ function resetGame() {
 function enableButtons() {
     document.getElementById('shakespeareBtn').disabled = false;
     document.getElementById('taylorBtn').disabled = false;
+    document.getElementById('skipBtn').disabled = false;
     isButtonDisabled = false;
 }
 
 function endGame() {
-    document.getElementById("result").innerText = `Game Over! Final Score: ${puntuacion}`;
+    const result = document.getElementById("result");
+    if (puntuacion > 0) {
+        result.innerHTML = `<span style="color: var(--correct-green);"><i class="fas fa-trophy"></i> Game Over! Final Score: ${puntuacion}</span>`;
+    } else if (puntuacion < 0) {
+        result.innerHTML = `<span style="color: var(--wrong-red);"><i class="fas fa-sad-tear"></i> Game Over! Final Score: ${puntuacion}</span>`;
+    } else {
+        result.innerHTML = `<span style="color: var(--text-dark);"><i class="fas fa-meh"></i> Game Over! Final Score: ${puntuacion}</span>`;
+    }
+    document.getElementById('shakespeareBtn').disabled = true;
+    document.getElementById('taylorBtn').disabled = true;
+    document.getElementById('skipBtn').disabled = true;
 }
 
 function startGameInfinite() {
@@ -196,12 +219,13 @@ function startGameInfinite() {
     isInfiniteMode = true;
     vidas = vidaInfinito;
     document.getElementById("mode").innerText = "Infinite Mode";
-    document.getElementById("vidas").innerText = `Lives: ${vidas}`;
-    document.getElementById("help").innerText = 
-    `If you choose the correct answer, you will gain 1 point.
-    If you choose incorrectly, you will lose 1 point and 1 live.
-    If you skip, you will loose 1 live.
-    The game ends when you lose all your lives.`
+    document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
+    document.getElementById("help").innerHTML =
+        `<strong>Infinite Mode Rules:</strong><br><br>
+                <i class="fas fa-check-circle" style="color: var(--correct-green);"></i> Correct guess: +1 point<br>
+                <i class="fas fa-times-circle" style="color: var(--wrong-red);"></i> Wrong guess: -1 point & lose 1 life<br>
+                <i class="fas fa-forward" style="color: #6c757d;"></i> Skip: lose 1 life<br>
+                <i class="fas fa-heart" style="color: var(--wrong-red);"></i> Game ends when you lose all 5 lives`;
     startGame();
 }
 
@@ -211,19 +235,20 @@ function startGameNormal() {
     phrasesCount = 0;
     vidas = vidasNormal;
     document.getElementById("mode").innerText = "Normal Mode";
-    document.getElementById("vidas").innerText = `Guesses: ${vidas}`;
-    document.getElementById("help").innerText =
-    `If you choose the correct answer, you will gain 1 point.
-    If you choose incorrectly, you will lose 1 point.
-    If you skip, you neither gain nor lose points.
-    The game ends after 10 guesses.`
+    document.getElementById("vidas").innerHTML = `<i class="fas fa-heart" style="color: var(--wrong-red);"></i> ${vidas}`;
+    document.getElementById("help").innerHTML =
+        `<strong>Normal Mode Rules:</strong><br><br>
+                <i class="fas fa-check-circle" style="color: var(--correct-green);"></i> Correct guess: +1 point<br>
+                <i class="fas fa-times-circle" style="color: var(--wrong-red);"></i> Wrong guess: -1 point<br>
+                <i class="fas fa-forward" style="color: #6c757d;"></i> Skip: no points gained or lost<br>
+                <i class="fas fa-heart" style="color: var(--wrong-red);"></i> 10 guesses total`;
     startGame();
 }
 
 function startGame() {
     document.getElementById("start-screen").style.display = "none";
     document.getElementById("game-container").style.display = "block";
-    loadFrase();
+    resetGame();
 }
 
 function backToStart() {
